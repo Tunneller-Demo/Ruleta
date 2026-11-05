@@ -9,6 +9,7 @@ import {
   sePuedeAnadir,
   sePuedeGirar,
 } from './ruleta.js';
+import { cargar, guardar } from './persistencia.js';
 
 const elementos = {
   formulario: document.getElementById('formulario'),
@@ -22,7 +23,13 @@ const elementos = {
   aviso: document.getElementById('aviso'),
 };
 
-let opciones = vaciar();
+let opciones = cargar();
+
+// Cada cambio de la Ruleta se guarda al momento.
+function actualizar(nuevas) {
+  opciones = nuevas;
+  guardar(opciones);
+}
 
 function avisoActual() {
   if (!sePuedeAnadir(opciones)) {
@@ -79,7 +86,7 @@ elementos.formulario.addEventListener('submit', (evento) => {
   evento.preventDefault();
   const resultado = anadirOpcion(opciones, elementos.campo.value);
   if (resultado.motivo === null) {
-    opciones = resultado.opciones;
+    actualizar(resultado.opciones);
     elementos.campo.value = '';
   } else if (resultado.motivo === 'vacia') {
     elementos.campo.value = '';
@@ -92,7 +99,7 @@ elementos.lista.addEventListener('click', (evento) => {
   const borrar = evento.target.closest('.opcion-borrar');
   if (!borrar) return;
   const posicion = Number(borrar.dataset.posicion);
-  opciones = borrarOpcion(opciones, posicion);
+  actualizar(borrarOpcion(opciones, posicion));
   pintar();
   // Deja el foco en una ✕ cercana para seguir borrando con el teclado.
   const botones = elementos.lista.querySelectorAll('.opcion-borrar');
@@ -102,7 +109,7 @@ elementos.lista.addEventListener('click', (evento) => {
 
 elementos.vaciar.addEventListener('click', () => {
   if (!window.confirm('¿Vaciar la Ruleta? Se borrarán todas las Opciones.')) return;
-  opciones = vaciar();
+  actualizar(vaciar());
   pintar();
   elementos.campo.focus();
 });

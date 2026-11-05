@@ -33,3 +33,23 @@ export function sePuedeAnadir(opciones) {
 export function sePuedeGirar(opciones) {
   return opciones.length >= MINIMO_PARA_GIRAR;
 }
+
+export function serializar(opciones) {
+  return JSON.stringify(opciones);
+}
+
+// Nunca lanza: ante un dato que no sea una lista de textos devuelve la Ruleta vacía,
+// y a una lista válida le aplica las mismas reglas que al añadir (recorte, vacías y máximo).
+export function deserializar(texto) {
+  let datos;
+  try {
+    datos = JSON.parse(texto);
+  } catch {
+    return vaciar();
+  }
+  if (!Array.isArray(datos) || !datos.every((opcion) => typeof opcion === 'string')) {
+    return vaciar();
+  }
+  const opciones = datos.map((opcion) => opcion.trim()).filter((opcion) => opcion !== '');
+  return congelar(opciones.slice(0, MAXIMO_OPCIONES));
+}
