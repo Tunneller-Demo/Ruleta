@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ruleta</title>
+  <link rel="stylesheet" href="estilos.css">
+  <script type="module" src="src/interfaz.js"></script>
+</head>
+<body>
+  <main class="ruleta">
+    <header class="cabecera">
+      <h1>Ruleta</h1>
+      <p class="subtitulo">Escribe tus Opciones y deja que la Ruleta elija.</p>
+    </header>
+
+    <section class="opciones" aria-labelledby="titulo-opciones">
+      <div class="opciones-cabecera">
+        <h2 id="titulo-opciones">Opciones <span id="contador" class="contador"></span></h2>
+        <button type="button" id="vaciar" class="boton boton-secundario">Vaciar</button>
+      </div>
+      <p id="lista-vacia" class="lista-vacia">Todavía no hay Opciones.</p>
+      <ol id="lista" class="lista"></ol>
+    </section>
+
+    <div class="controles">
+      <p id="aviso" class="aviso" role="status" aria-live="polite"></p>
+      <form id="formulario" class="formulario" autocomplete="off">
+        <label for="campo" class="solo-lector">Nueva Opción</label>
+        <input id="campo" class="campo" type="text" placeholder="Escribe una Opción" enterkeyhint="done">
+        <button type="submit" id="anadir" class="boton">Añadir</button>
+      </form>
+      <button type="button" id="girar" class="boton boton-principal" disabled>Girar</button>
+    </div>
+  </main>
+</body>
+</html>
