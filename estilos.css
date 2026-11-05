@@ -48,7 +48,9 @@ body {
 
 .rueda {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .rueda-svg {
@@ -56,6 +58,25 @@ body {
   width: min(100%, 22rem);
   height: auto;
   aspect-ratio: 1;
+}
+
+/* Gira alrededor del eje: el centro de la caja del grupo es el eje mientras nada salga del círculo.
+   La duración la pone la interfaz en cada Giro. */
+.rueda-sectores {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.15, 0.85, 0.25, 1);
+}
+
+.resultado {
+  margin: 0;
+  min-height: 2.75rem;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .rueda-vacia {

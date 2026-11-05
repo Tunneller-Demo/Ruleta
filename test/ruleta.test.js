@@ -10,6 +10,10 @@ import {
   sePuedeGirar,
   serializar,
   deserializar,
+  girar,
+  numeroAleatorio,
+  anguloFinal,
+  VUELTAS,
 } from '../src/ruleta.js';
 
 const ruletaCon = (cantidad) =>
@@ -112,4 +116,88 @@ test('deserializar recorta los espacios y descarta las Opciones vacías', () => 
 test(`deserializar más de ${MAXIMO_OPCIONES} Opciones conserva solo las ${MAXIMO_OPCIONES} primeras`, () => {
   const opciones = deserializar(JSON.stringify(ruletaCon(MAXIMO_OPCIONES + 5)));
   assert.deepEqual(opciones, ruletaCon(MAXIMO_OPCIONES));
+});
+
+const fuenteFija = (valor) => () => valor;
+const CASI_UNO = 1 - Number.EPSILON;
+
+test('un Giro con la fuente en 0 cae en el primer sector', () => {
+  assert.equal(girar(ruletaCon(5), fuenteFija(0)), 0);
+});
+
+test('un Giro con la fuente casi en 1 cae en el último sector', () => {
+  for (let cantidad = 2; cantidad <= MAXIMO_OPCIONES; cantidad++) {
+    assert.equal(girar(ruletaCon(cantidad), fuenteFija(CASI_UNO)), cantidad - 1);
+  }
+});
+
+test('para cada sector hay un valor de la fuente que lo elige', () => {
+  for (let cantidad = 2; cantidad <= MAXIMO_OPCIONES; cantidad++) {
+    for (let indice = 0; indice < cantidad; indice++) {
+      const valor = (indice + 0.5) / cantidad;
+      assert.equal(girar(ruletaCon(cantidad), fuenteFija(valor)), indice);
+    }
+  }
+});
+
+test('con Opciones repetidas cada aparición es un sector propio', () => {
+  const opciones = ['Pizza', 'Sushi', 'Pizza'];
+  const elegidos = [0.1, 0.5, 0.9].map((valor) => girar(opciones, fuenteFija(valor)));
+  assert.deepEqual(elegidos, [0, 1, 2]);
+});
+
+test('con menos de 2 Opciones no hay Giro', () => {
+  assert.equal(girar(ruletaCon(0), fuenteFija(0)), null);
+  assert.equal(girar(ruletaCon(1), fuenteFija(0)), null);
+});
+
+test('sin fuente inyectada el Giro usa crypto.getRandomValues', (t) => {
+  const getRandomValues = t.mock.method(globalThis.crypto, 'getRandomValues', (array) => {
+    array[0] = 2 ** 32 - 1;
+    return array;
+  });
+  assert.equal(girar(ruletaCon(4)), 3);
+  assert.equal(getRandomValues.mock.callCount(), 1);
+});
+
+test('numeroAleatorio devuelve un número en [0, 1)', () => {
+  for (let i = 0; i < 100; i++) {
+    const valor = numeroAleatorio();
+    assert.ok(valor >= 0 && valor < 1, `${valor}`);
+  }
+});
+
+// Ángulo, en [0, 360), en el que queda el centro de un sector tras rotar la rueda.
+const centroTrasGirar = (angulo, indice, cantidad) => {
+  const paso = 360 / cantidad;
+  return (((angulo + indice * paso + paso / 2) % 360) + 360) % 360;
+};
+const bajoElIndicador = (grados) => Math.min(grados, 360 - grados) < 1e-9;
+
+test('el ángulo final deja el centro del sector bajo el indicador e incluye varias vueltas', () => {
+  assert.ok(VUELTAS >= 3);
+  for (let cantidad = 2; cantidad <= MAXIMO_OPCIONES; cantidad++) {
+    for (let indice = 0; indice < cantidad; indice++) {
+      const angulo = anguloFinal(indice, cantidad);
+      assert.ok(bajoElIndicador(centroTrasGirar(angulo, indice, cantidad)), `${indice} de ${cantidad}`);
+      assert.ok(angulo >= VUELTAS * 360, `${indice} de ${cantidad}: ${angulo}`);
+      assert.ok(angulo < (VUELTAS + 1) * 360, `${indice} de ${cantidad}: ${angulo}`);
+    }
+  }
+});
+
+test('el ángulo final sigue hacia delante desde el ángulo en que quedó la rueda', () => {
+  const desde = anguloFinal(2, 7);
+  for (let indice = 0; indice < 7; indice++) {
+    const angulo = anguloFinal(indice, 7, { desde });
+    assert.ok(bajoElIndicador(centroTrasGirar(angulo, indice, 7)));
+    assert.ok(angulo >= desde + VUELTAS * 360);
+    assert.ok(angulo < desde + (VUELTAS + 1) * 360);
+  }
+});
+
+test('sin vueltas, el ángulo final avanza menos de una vuelta', () => {
+  const angulo = anguloFinal(1, 4, { desde: 100, vueltas: 0 });
+  assert.ok(bajoElIndicador(centroTrasGirar(angulo, 1, 4)));
+  assert.ok(angulo >= 100 && angulo < 460);
 });
