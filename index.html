@@ -14,6 +14,14 @@
       <p class="subtitulo">Escribe tus Opciones y deja que la Ruleta elija.</p>
     </header>
 
+    <section class="rueda">
+      <svg id="rueda" class="rueda-svg" viewBox="-110 -110 220 220" role="img" aria-label="Ruleta sin Opciones">
+        <g id="rueda-sectores" class="rueda-sectores" aria-hidden="true"></g>
+        <circle class="rueda-eje" r="6" aria-hidden="true"></circle>
+        <polygon class="rueda-indicador" points="-9,-108 9,-108 0,-88" aria-hidden="true"></polygon>
+      </svg>
+    </section>
+
     <section class="opciones" aria-labelledby="titulo-opciones">
       <div class="opciones-cabecera">
         <h2 id="titulo-opciones">Opciones <span id="contador" class="contador"></span></h2>

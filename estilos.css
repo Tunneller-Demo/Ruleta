@@ -46,6 +46,47 @@ body {
   color: var(--texto-suave);
 }
 
+.rueda {
+  display: flex;
+  justify-content: center;
+}
+
+.rueda-svg {
+  display: block;
+  width: min(100%, 22rem);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.rueda-vacia {
+  fill: var(--superficie);
+  stroke: var(--borde);
+  stroke-width: 1.5;
+}
+
+.rueda-aviso {
+  fill: var(--texto-suave);
+  font-size: 11px;
+}
+
+.rueda-texto {
+  fill: #ffffff;
+  font-weight: 600;
+}
+
+.rueda-eje {
+  fill: var(--superficie);
+  stroke: var(--texto);
+  stroke-width: 1.5;
+}
+
+.rueda-indicador {
+  fill: var(--texto);
+  stroke: var(--superficie);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
 .opciones {
   flex: 1;
 }
@@ -196,20 +237,35 @@ body {
   white-space: nowrap;
 }
 
-/* Pantalla ancha: la lista y los controles, lado a lado. */
+/* Pantalla ancha: la rueda a la izquierda; la lista y los controles, a la derecha. */
 @media (min-width: 48rem) {
   .ruleta {
     max-width: 60rem;
     padding: 2rem;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
     column-gap: 2rem;
     min-height: auto;
   }
 
   .cabecera {
     grid-column: 1 / -1;
+  }
+
+  .rueda {
+    grid-column: 1;
+    grid-row: 2 / 4;
+    align-self: start;
+  }
+
+  .rueda-svg {
+    width: min(100%, 26rem);
+  }
+
+  .opciones,
+  .controles {
+    grid-column: 2;
   }
 
   .controles {

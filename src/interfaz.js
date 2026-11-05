@@ -10,6 +10,7 @@ import {
   sePuedeGirar,
 } from './ruleta.js';
 import { cargar, guardar } from './persistencia.js';
+import { dibujarRueda } from './rueda.js';
 
 const elementos = {
   formulario: document.getElementById('formulario'),
@@ -21,6 +22,8 @@ const elementos = {
   vaciar: document.getElementById('vaciar'),
   girar: document.getElementById('girar'),
   aviso: document.getElementById('aviso'),
+  rueda: document.getElementById('rueda'),
+  sectores: document.getElementById('rueda-sectores'),
 };
 
 let opciones = cargar();
@@ -71,8 +74,16 @@ function pintarLista() {
   elementos.lista.replaceChildren(...filas);
 }
 
+function nombreDeRueda() {
+  if (opciones.length === 0) return 'Ruleta sin Opciones';
+  if (opciones.length === 1) return 'Ruleta con 1 Opción';
+  return `Ruleta con ${opciones.length} Opciones`;
+}
+
 function pintar() {
   pintarLista();
+  dibujarRueda(elementos.sectores, opciones);
+  elementos.rueda.setAttribute('aria-label', nombreDeRueda());
   const hayOpciones = opciones.length > 0;
   elementos.listaVacia.hidden = hayOpciones;
   elementos.contador.textContent = `(${opciones.length} de ${MAXIMO_OPCIONES})`;
